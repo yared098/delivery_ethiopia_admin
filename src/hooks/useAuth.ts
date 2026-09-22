@@ -4,46 +4,53 @@ import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 import type { LoginResponse } from '@/types';
 
-export function useRequestStaffOtp() {
+// ══════════════════════════════════════════════════
+// SUPER ADMIN (phone + OTP)
+// ══════════════════════════════════════════════════
+
+export function useRequestSuperAdminOtp() {
   return useMutation({
-    mutationFn: async (phone: string) => {
-      const res = await api.post('/auth/staff/otp/request', { phone });
-      return res.data;
-    },
+    mutationFn: (phone: string) =>
+      api.post('/auth/super-admin/otp/request', { phone }).then((r) => r.data),
   });
 }
 
-export function useVerifyStaffOtp() {
+export function useVerifySuperAdminOtp() {
   const setAuth = useAuthStore((s) => s.setAuth);
   return useMutation({
-    mutationFn: async ({ phone, code }: { phone: string; code: string }) => {
-      const res = await api.post<LoginResponse>('/auth/staff/otp/verify', {
-        phone,
-        code,
-      });
-      return res.data;
-    },
+    mutationFn: (d: { phone: string; code: string }) =>
+      api.post<LoginResponse>('/auth/super-admin/otp/verify', d).then((r) => r.data),
     onSuccess: (data) => {
       setAuth(data.account, data.accountType, data.accessToken, data.refreshToken);
     },
   });
 }
 
-export function useStaffPasswordLogin() {
+// ══════════════════════════════════════════════════
+// STAFF (phone + password → OTP)
+// ══════════════════════════════════════════════════
+
+export function useStaffLogin() {
+  return useMutation({
+    mutationFn: (d: { phone: string; password: string }) =>
+      api.post('/auth/staff/login', d).then((r) => r.data),
+  });
+}
+
+export function useStaffLoginVerify() {
   const setAuth = useAuthStore((s) => s.setAuth);
   return useMutation({
-    mutationFn: async ({ phone, password }: { phone: string; password: string }) => {
-      const res = await api.post<LoginResponse>('/auth/staff/password/login', {
-        phone,
-        password,
-      });
-      return res.data;
-    },
+    mutationFn: (d: { tempToken: string; code: string }) =>
+      api.post<LoginResponse>('/auth/staff/login/verify', d).then((r) => r.data),
     onSuccess: (data) => {
       setAuth(data.account, data.accountType, data.accessToken, data.refreshToken);
     },
   });
 }
+
+// ══════════════════════════════════════════════════
+// LOGOUT
+// ══════════════════════════════════════════════════
 
 export function useLogout() {
   const { refreshToken } = useAuthStore();
