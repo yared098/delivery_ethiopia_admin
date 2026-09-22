@@ -1,0 +1,143 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { api, apiError } from '@/lib/api';
+import type { Order, OrderStatus, PaginatedResponse, PaymentParty, ItemType } from '@/types';
+
+const KEY = ['orders'];
+
+interface ListOrdersParams {
+  status?: OrderStatus;
+  senderId?: string;
+  receiverId?: string;
+  courierId?: string;
+  originBranchId?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export function useOrders(params: ListOrdersParams = {}) {
+  return useQuery({
+    queryKey: [...KEY, params],
+    queryFn: async () => {
+      const res = await api.get<PaginatedResponse<Order>>('/admin/orders', { params });
+      return res.data;
+    },
+  });
+}
+
+export function useOrder(id: string | null) {
+  return useQuery({
+    queryKey: ['order', id],
+    queryFn: async () => {
+      const res = await api.get<Order>(`/admin/orders/${id}`);
+      return res.data;
+    },
+    enabled: !!id,
+  });
+}
+
+interface CreateOrderItem {
+  type: ItemType;
+  description?: string;
+  quantity?: number;
+  weightKg: number;
+  lengthCm?: number;
+  widthCm?: number;
+  heightCm?: number;
+  volumeL?: number;
+  declaredValue?: number;
+  isFragile?: boolean;
+  isRefrigerated?: boolean;
+  photoUrl?: string;
+}
+
+interface CreateOrderPayload {
+  sender: {
+    customerId?: string;
+    name: string;
+    phone: string;
+    address?: string;
+    lat?: number;
+    lng?: number;
+  };
+  receiver: {
+    customerId?: string;
+    name?: string;
+    phone: string;
+    address?: string;
+    lat?: number;
+    lng?: number;
+  };
+  items: CreateOrderItem[];
+  originBranchId?: string;
+  destBranchId?: string;
+  packageDescription?: string;
+  paymentParty?: PaymentParty;
+  sendReceiverLink?: boolean;
+  codAmount?: number;
+  notes?: string;
+}
+
+export function useCreateOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: CreateOrderPayload) => {
+      const res = await api.post<{ order: Order; receiverLink: any }>('/admin/orders', data);
+      return res.data;
+    },
+    onSuccess: (res) => {
+      toast.success(`Order ${res.order.trackingNumber} created`);
+      qc.invalidateQueries({ queryKey: KEY });
+    },
+    onError: (err) => toast.error(apiError(err)),
+  });
+}
+
+export function useUpdateOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const res = await api.patch<Order>(`/admin/orders/${id}`, data);
+      return res.data;
+    },
+    onSuccess: (o) => {
+      toast.success(`Order ${o.trackingNumber} updated`);
+      qc.invalidateQueries({ queryKey: KEY });
+      qc.invalidateQueries({ queryKey: ['order', o.id] });
+    },
+    onError: (err) => toast.error(apiError(err)),
+  });
+}
+
+export function useSendReceiverLink() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.post(`/admin/orders/${id}/send-receiver-link`, {
+        sendSms: true,
+      });
+      return res.data;
+    },
+    onSuccess: (res) => {
+      toast.success('Receiver link sent');
+      qc.invalidateQueries({ queryKey: KEY });
+    },
+    onError: (err) => toast.error(apiError(err)),
+  });
+}
+
+export function useCancelOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.post(`/admin/orders/${id}/cancel`);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success('Order cancelled');
+      qc.invalidateQueries({ queryKey: KEY });
+    },
+    onError: (err) => toast.error(apiError(err)),
+  });
+}
