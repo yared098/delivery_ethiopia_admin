@@ -241,6 +241,26 @@ export function useCancelOrder() {
 }
 
 // ══════════════════════════════════════════════════
+// DELETE (hard) — SUPER_ADMIN only
+// ══════════════════════════════════════════════════
+
+export function useDeleteOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.delete(`/admin/orders/${id}`);
+      return res.data;
+    },
+    onSuccess: (_data, id) => {
+      toast.success('Order deleted');
+      qc.invalidateQueries({ queryKey: KEY });
+      qc.removeQueries({ queryKey: ['order', id] });
+    },
+    onError: (err) => toast.error(apiError(err)),
+  });
+}
+
+// ══════════════════════════════════════════════════
 // LOCATION UPDATE (test / staff fallback)
 // ══════════════════════════════════════════════════
 

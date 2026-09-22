@@ -12,6 +12,11 @@ import {
   Send,
   AlertCircle,
   Loader2,
+  Copy,
+  Check,
+  MessageSquare,
+  Clock,
+  ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -36,8 +41,8 @@ const ITEM_TYPE_LABELS: Record<ItemType, string> = {
 };
 
 interface ItemForm {
-  type?: ItemType;               // optional
-  description: string;           // REQUIRED — the item name
+  type?: ItemType;
+  description: string;
   quantity: number;
   weightKg: number;
   lengthCm?: number;
@@ -65,6 +70,24 @@ interface ReceiverForm {
   lat?: number;
   lng?: number;
   sendLink: boolean;
+}
+
+/**
+ * Shape of the receiverLink object returned by the backend
+ * when the order was created with `sendReceiverLink: true`.
+ */
+interface ReceiverLinkResult {
+  id: string;
+  shortCode: string;
+  url: string;
+  expiresAt: string;
+  phone: string;
+}
+
+interface CreateOrderResult {
+  order: { id: string; trackingNumber: string; status: string };
+  receiverLink: ReceiverLinkResult | null;
+  courierAssigned: any | null;
 }
 
 export function OrderCreate() {
@@ -100,6 +123,9 @@ export function OrderCreate() {
   const [codAmount, setCodAmount] = useState(0);
   const [packageDescription, setPackageDescription] = useState('');
 
+  // 🆕 Result of a successful create that included a receiver link
+  const [linkResult, setLinkResult] = useState<CreateOrderResult | null>(null);
+
   const senderLookup = useLookupCustomer(sender.phone.length >= 9 ? sender.phone : null);
   const receiverLookup = useLookupCustomer(receiver.phone.length >= 9 ? receiver.phone : null);
 
@@ -126,6 +152,8 @@ export function OrderCreate() {
         setError('Invalid receiver phone');
         return false;
       }
+      // If we're NOT sending a link, address is required.
+      // If we ARE sending a link, name/address are optional.
       if (!receiver.sendLink) {
         if (!receiver.name.trim()) {
           setError('Receiver name is required (or check "Send link")');
@@ -218,15 +246,16 @@ export function OrderCreate() {
       },
       receiver: {
         customerId: receiver.customerId,
-        name: receiver.name || undefined,
+        // When sendLink is true, omit address + GPS so backend treats it as "unknown location"
+        name: receiver.sendLink ? undefined : receiver.name || undefined,
         phone: receiver.phone,
-        address: receiver.address || undefined,
-        lat: receiver.lat,
-        lng: receiver.lng,
+        address: receiver.sendLink ? undefined : receiver.address || undefined,
+        lat: receiver.sendLink ? undefined : receiver.lat,
+        lng: receiver.sendLink ? undefined : receiver.lng,
       },
       items: items.map((it) => ({
-        type: it.type,                 // may be undefined → backend defaults to OTHER
-        description: it.description,   // ← the item name
+        type: it.type,
+        description: it.description,
         quantity: it.quantity,
         weightKg: it.weightKg,
         lengthCm: it.lengthCm,
@@ -244,12 +273,53 @@ export function OrderCreate() {
     };
 
     try {
-      const res = await create.mutateAsync(payload);
+      const res = (await create.mutateAsync(payload)) as CreateOrderResult;
+
+      // 🆕 If the backend returned a receiver link, show the success panel
+      if (res.receiverLink) {
+        setLinkResult(res);
+        return; // stay on page — user will see the link panel
+      }
+
+      // Otherwise → normal redirect
       navigate(`/orders/${res.order.id}`);
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to create order');
     }
   };
+
+  // ══════════════════════════════════════════════════
+  // SUCCESS PANEL — shown after creating an order that
+  // included a receiver link
+  // ══════════════════════════════════════════════════
+  if (linkResult?.receiverLink) {
+    return (
+      <ReceiverLinkSuccess
+        result={linkResult}
+        onGoToOrder={() => navigate(`/orders/${linkResult.order.id}`)}
+        onCreateAnother={() => {
+          setLinkResult(null);
+          setStep(1);
+          setSender({ name: '', phone: '', address: '' });
+          setReceiver({ name: '', phone: '', address: '', sendLink: false });
+          setItems([
+            {
+              description: '',
+              quantity: 1,
+              weightKg: 0,
+              isFragile: false,
+              isRefrigerated: false,
+            },
+          ]);
+          setOriginBranchId('');
+          setRegionId('');
+          setPaymentParty(PaymentParty.SENDER);
+          setCodAmount(0);
+          setPackageDescription('');
+        }}
+      />
+    );
+  }
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -308,7 +378,9 @@ export function OrderCreate() {
         </div>
       )}
 
-      {/* STEP 1: SENDER */}
+      {/* ══════════════════════════════════════════════════
+          STEP 1: SENDER
+      ══════════════════════════════════════════════════ */}
       {step === 1 && (
         <div className="card p-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -434,7 +506,9 @@ export function OrderCreate() {
         </div>
       )}
 
-      {/* STEP 2: RECEIVER */}
+      {/* ══════════════════════════════════════════════════
+          STEP 2: RECEIVER
+      ══════════════════════════════════════════════════ */}
       {step === 2 && (
         <div className="card p-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -562,7 +636,9 @@ export function OrderCreate() {
         </div>
       )}
 
-      {/* STEP 3: ITEMS */}
+      {/* ══════════════════════════════════════════════════
+          STEP 3: ITEMS
+      ══════════════════════════════════════════════════ */}
       {step === 3 && (
         <div className="card p-6">
           <div className="flex items-center justify-between mb-4">
@@ -743,7 +819,9 @@ export function OrderCreate() {
         </div>
       )}
 
-      {/* STEP 4: REVIEW */}
+      {/* ══════════════════════════════════════════════════
+          STEP 4: REVIEW
+      ══════════════════════════════════════════════════ */}
       {step === 4 && (
         <div className="space-y-4">
           <div className="card p-6">
@@ -782,7 +860,7 @@ export function OrderCreate() {
               <p className="font-mono text-xs text-gray-500">{receiver.phone}</p>
               {receiver.sendLink ? (
                 <p className="text-xs text-blue-700 bg-blue-50 px-2 py-1 rounded inline-block">
-                  📩 Location link will be sent via SMS
+                  📩 Location link will be sent via SMS after order is created
                 </p>
               ) : (
                 receiver.address && <p>{receiver.address}</p>
@@ -895,9 +973,159 @@ export function OrderCreate() {
           </Button>
         ) : (
           <Button onClick={handleSubmit} loading={create.isPending}>
-            <CheckCircle2 className="h-4 w-4" /> Create Order
+            {receiver.sendLink ? (
+              <>
+                <Send className="h-4 w-4" /> Create & Send Link
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="h-4 w-4" /> Create Order
+              </>
+            )}
           </Button>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// RECEIVER LINK SUCCESS PANEL
+// ══════════════════════════════════════════════════════
+function ReceiverLinkSuccess({
+  result,
+  onGoToOrder,
+  onCreateAnother,
+}: {
+  result: CreateOrderResult;
+  onGoToOrder: () => void;
+  onCreateAnother: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const link = result.receiverLink!;
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(link.url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const expiresAt = new Date(link.expiresAt);
+  const hoursLeft = Math.max(
+    0,
+    Math.round((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60)),
+  );
+
+  return (
+    <div className="p-8 max-w-3xl mx-auto">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+          <CheckCircle2 className="h-9 w-9 text-green-600" />
+        </div>
+        <h1 className="text-2xl font-bold text-gray-900">Order Created</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Tracking #{result.order.trackingNumber}
+        </p>
+      </div>
+
+      <div className="card p-6 mb-4">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">
+              Location request link sent
+            </h2>
+            <p className="text-sm text-gray-600 mt-0.5">
+              We sent an SMS to{' '}
+              <span className="font-mono text-gray-800">{link.phone}</span>.
+              They'll tap the link, share their GPS, and the order will
+              automatically become ready for a courier.
+            </p>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-100 pt-4">
+          <label className="label text-xs">Link URL</label>
+          <div className="flex items-center gap-2">
+            <input
+              readOnly
+              value={link.url}
+              className="input flex-1 text-sm font-mono bg-gray-50"
+              onFocus={(e) => e.target.select()}
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={copy}
+              className="whitespace-nowrap"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4 text-green-600" /> Copied                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" /> Copy
+                </>
+              )}
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div>
+              <label className="label text-xs">Short code</label>
+              <p className="text-sm font-mono text-gray-800 bg-gray-50 px-3 py-2 rounded">
+                {link.shortCode}
+              </p>
+            </div>
+            <div>
+              <label className="label text-xs flex items-center gap-1">
+                <Clock className="h-3 w-3" /> Expires in
+              </label>
+              <p className="text-sm text-gray-800 bg-gray-50 px-3 py-2 rounded">
+                {hoursLeft} hours
+              </p>
+            </div>
+          </div>
+
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-primary-600 hover:underline mt-4"
+          >
+            <ExternalLink className="h-3 w-3" /> Preview what the receiver sees
+          </a>
+        </div>
+      </div>
+
+      <div className="bg-amber-50 border border-amber-200 rounded-md p-4 mb-6">
+        <p className="text-xs text-amber-800">
+          <b>What happens next?</b> When the receiver opens the link and shares
+          their location, the order status changes from{' '}
+          <code className="font-mono bg-amber-100 px-1 rounded">
+            AWAITING_RECEIVER_LOCATION
+          </code>{' '}
+          to{' '}
+          <code className="font-mono bg-amber-100 px-1 rounded">
+            PENDING_PAYMENT
+          </code>
+          , and a courier can be assigned.
+        </p>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <Button variant="secondary" onClick={onCreateAnother}>
+          <Plus className="h-4 w-4" /> Create Another
+        </Button>
+        <Button onClick={onGoToOrder}>
+          View Order <ArrowRight className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
