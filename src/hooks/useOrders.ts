@@ -16,6 +16,10 @@ interface ListOrdersParams {
   limit?: number;
 }
 
+// ══════════════════════════════════════════════════
+// QUERIES
+// ══════════════════════════════════════════════════
+
 export function useOrders(params: ListOrdersParams = {}) {
   return useQuery({
     queryKey: [...KEY, params],
@@ -37,9 +41,13 @@ export function useOrder(id: string | null) {
   });
 }
 
+// ══════════════════════════════════════════════════
+// CREATE
+// ══════════════════════════════════════════════════
+
 interface CreateOrderItem {
-  type: ItemType;
-  description?: string;
+  type?: ItemType;
+  description: string;
   quantity?: number;
   weightKg: number;
   lengthCm?: number;
@@ -77,22 +85,38 @@ interface CreateOrderPayload {
   sendReceiverLink?: boolean;
   codAmount?: number;
   notes?: string;
+  courierId?: string;
+  autoAssignCourier?: boolean;
 }
 
 export function useCreateOrder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: CreateOrderPayload) => {
-      const res = await api.post<{ order: Order; receiverLink: any }>('/admin/orders', data);
+      const res = await api.post<{
+        order: Order;
+        receiverLink: any;
+        courierAssigned: any;
+      }>('/admin/orders', data);
       return res.data;
     },
     onSuccess: (res) => {
-      toast.success(`Order ${res.order.trackingNumber} created`);
+      if (res.courierAssigned) {
+        toast.success(
+          `Order ${res.order.trackingNumber} created · assigned to ${res.courierAssigned.name}`,
+        );
+      } else {
+        toast.success(`Order ${res.order.trackingNumber} created`);
+      }
       qc.invalidateQueries({ queryKey: KEY });
     },
     onError: (err) => toast.error(apiError(err)),
   });
 }
+
+// ══════════════════════════════════════════════════
+// UPDATE
+// ══════════════════════════════════════════════════
 
 export function useUpdateOrder() {
   const qc = useQueryClient();
@@ -110,6 +134,74 @@ export function useUpdateOrder() {
   });
 }
 
+// ══════════════════════════════════════════════════
+// COURIER ASSIGNMENT
+// ══════════════════════════════════════════════════
+
+export function useAssignCourier() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      orderId,
+      courierId,
+    }: {
+      orderId: string;
+      courierId: string;
+    }) => {
+      const res = await api.post(`/admin/orders/${orderId}/assign-courier`, {
+        courierId,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(
+        `Assigned to ${data.courier?.name || 'courier'}`,
+      );
+      qc.invalidateQueries({ queryKey: KEY });
+      qc.invalidateQueries({ queryKey: ['order'] });
+    },
+    onError: (err) => toast.error(apiError(err)),
+  });
+}
+
+export function useAutoAssignCourier() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (orderId: string) => {
+      const res = await api.post(`/admin/orders/${orderId}/auto-assign`);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(
+        `Auto-assigned to ${data.courier?.name || 'best available courier'}`,
+      );
+      qc.invalidateQueries({ queryKey: KEY });
+      qc.invalidateQueries({ queryKey: ['order'] });
+    },
+    onError: (err) => toast.error(apiError(err)),
+  });
+}
+
+export function useUnassignCourier() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (orderId: string) => {
+      const res = await api.post(`/admin/orders/${orderId}/unassign-courier`);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success('Courier unassigned');
+      qc.invalidateQueries({ queryKey: KEY });
+      qc.invalidateQueries({ queryKey: ['order'] });
+    },
+    onError: (err) => toast.error(apiError(err)),
+  });
+}
+
+// ══════════════════════════════════════════════════
+// RECEIVER LINK
+// ══════════════════════════════════════════════════
+
 export function useSendReceiverLink() {
   const qc = useQueryClient();
   return useMutation({
@@ -119,13 +211,18 @@ export function useSendReceiverLink() {
       });
       return res.data;
     },
-    onSuccess: (res) => {
+    onSuccess: () => {
       toast.success('Receiver link sent');
       qc.invalidateQueries({ queryKey: KEY });
+      qc.invalidateQueries({ queryKey: ['order'] });
     },
     onError: (err) => toast.error(apiError(err)),
   });
 }
+
+// ══════════════════════════════════════════════════
+// CANCEL
+// ══════════════════════════════════════════════════
 
 export function useCancelOrder() {
   const qc = useQueryClient();
@@ -137,6 +234,37 @@ export function useCancelOrder() {
     onSuccess: () => {
       toast.success('Order cancelled');
       qc.invalidateQueries({ queryKey: KEY });
+      qc.invalidateQueries({ queryKey: ['order'] });
+    },
+    onError: (err) => toast.error(apiError(err)),
+  });
+}
+
+// ══════════════════════════════════════════════════
+// LOCATION UPDATE (test / staff fallback)
+// ══════════════════════════════════════════════════
+
+export function useUpdateOrderLocation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      orderId,
+      lat,
+      lng,
+    }: {
+      orderId: string;
+      lat: number;
+      lng: number;
+    }) => {
+      const res = await api.post(`/admin/orders/${orderId}/location`, {
+        lat,
+        lng,
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: KEY });
+      qc.invalidateQueries({ queryKey: ['order'] });
     },
     onError: (err) => toast.error(apiError(err)),
   });
