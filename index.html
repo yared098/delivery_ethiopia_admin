@@ -9,5 +9,23 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+  (function () {
+    try {
+      var stored = localStorage.getItem('deliver-et-theme');
+      var theme = stored ? JSON.parse(stored).state.theme : 'system';
+      var resolved =
+        theme === 'system'
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light'
+          : theme;
+      if (resolved === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      document.documentElement.style.colorScheme = resolved;
+    } catch (e) {}
+  })();
+</script>
   </body>
 </html>

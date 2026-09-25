@@ -4,40 +4,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ══════════════════════════════════════════════════
+   Base
+   ══════════════════════════════════════════════════ */
 @layer base {
-  html, body, #root {
+  html,
+  body,
+  #root {
     height: 100%;
   }
+
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100;
   }
 }
 
+/* ══════════════════════════════════════════════════
+   Components
+   ══════════════════════════════════════════════════ */
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
   }
+
   .btn-primary {
     @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
   }
+
   .btn-secondary {
-    @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-primary-500;
+    @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-primary-500
+           dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800;
   }
+
   .btn-danger {
     @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
   }
+
   .input {
-    @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none disabled:bg-gray-100;
+    @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm
+           focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none
+           disabled:bg-gray-100
+           dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700
+           dark:placeholder:text-gray-500 dark:disabled:bg-gray-800;
   }
+
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300;
   }
+
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200;
+    @apply bg-white rounded-lg shadow-sm border border-gray-200
+           dark:bg-gray-900 dark:border-gray-800;
   }
 }
 
-/* ─── Leaflet marker pulse animation ─── */
+/* ══════════════════════════════════════════════════
+   Leaflet map styles
+   ══════════════════════════════════════════════════ */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  font-family: inherit;
+}
+
+/* Marker pulse animation */
 @keyframes pulse-ring {
   0% {
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
@@ -50,10 +81,10 @@
   }
 }
 
-/* Leaflet container needs height */
-.leaflet-container {
-  height: 100%;
-  width: 100%;
-  z-index: 0;
-  font-family: inherit;
+/* Dark-mode Leaflet tweaks (optional) */
+.dark .leaflet-tile {
+  filter: brightness(0.85) invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+.dark .leaflet-container {
+  background: #0f172a;
 }

@@ -76,17 +76,17 @@ export function Notifications() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* LEFT — Compose form (3/5) */}
         <div className="lg:col-span-3">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-primary-50/50 to-transparent">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-primary-50/50 dark:from-primary-950/20 to-transparent">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-primary-100 flex items-center justify-center">
-                  <Bell className="h-4 w-4 text-primary-700" />
+                <div className="h-8 w-8 rounded-lg bg-primary-100 dark:bg-primary-950/60 flex items-center justify-center">
+                  <Bell className="h-4 w-4 text-primary-700 dark:text-primary-400" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold text-gray-900">
+                  <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     Compose Notification
                   </h2>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     Fill the details and hit send
                   </p>
                 </div>
@@ -111,9 +111,9 @@ export function Notifications() {
 
         {/* RIGHT — Tabbed sidebar (2/5) */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-260px)]">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-260px)]">
             {/* Tabs */}
-            <div className="flex border-b border-gray-100 bg-gray-50/40">
+            <div className="flex border-b border-gray-100 dark:border-gray-800 bg-gray-50/40 dark:bg-gray-950/40">
               <RightTabButton
                 active={rightTab === 'history'}
                 onClick={() => setRightTab('history')}
@@ -176,13 +176,13 @@ function HistoryPanel() {
   return (
     <div>
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-gray-100 px-4 py-2.5 flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-100 dark:border-gray-800 px-4 py-2.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-semibold text-gray-700 uppercase tracking-wide">
+          <span className="text-[11px] font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
             Recent
           </span>
           {unreadCount > 0 && (
-            <span className="bg-primary-100 text-primary-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+            <span className="bg-primary-100 dark:bg-primary-950/60 text-primary-700 dark:text-primary-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
               {unreadCount} new
             </span>
           )}
@@ -190,7 +190,7 @@ function HistoryPanel() {
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-40"
+          className="p-1 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-40"
           title="Refresh"
         >
           <RefreshCw
@@ -200,7 +200,7 @@ function HistoryPanel() {
       </div>
 
       {/* Rows */}
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-gray-100 dark:divide-gray-800">
         {data.data.map((n, i) => (
           <HistoryRow
             key={n.id}
@@ -213,10 +213,10 @@ function HistoryPanel() {
 
       {/* Footer */}
       {data.pages > 1 && (
-        <div className="p-3 text-center border-t border-gray-100">
+        <div className="p-3 text-center border-t border-gray-100 dark:border-gray-800">
           <button
             onClick={() => navigate('/notifications/history')}
-            className="text-xs text-primary-600 hover:text-primary-700 font-medium inline-flex items-center gap-1 group"
+            className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium inline-flex items-center gap-1 group"
           >
             View all {data.total}
             <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
@@ -235,13 +235,13 @@ function HistorySkeleton() {
   return (
     <div>
       {/* Header skeleton */}
-      <div className="px-4 py-2.5 border-b border-gray-100 flex items-center justify-between">
-        <div className="h-3 w-16 bg-gray-200 rounded animate-pulse" />
-        <div className="h-3.5 w-3.5 bg-gray-200 rounded animate-pulse" />
+      <div className="px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div className="h-3 w-16 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+        <div className="h-3.5 w-3.5 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
       </div>
 
       {/* Row skeletons */}
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-gray-100 dark:divide-gray-800">
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
@@ -249,34 +249,34 @@ function HistorySkeleton() {
             style={{ opacity: 1 - i * 0.12 }}
           >
             {/* Icon */}
-            <div className="h-9 w-9 rounded-xl bg-gray-200 animate-pulse shrink-0" />
+            <div className="h-9 w-9 rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse shrink-0" />
 
             <div className="flex-1 min-w-0 space-y-2">
               {/* Title + time */}
               <div className="flex items-center justify-between gap-3">
                 <div
-                  className="h-3 bg-gray-200 rounded animate-pulse"
+                  className="h-3 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"
                   style={{ width: `${45 + ((i * 13) % 35)}%` }}
                 />
-                <div className="h-2.5 w-8 bg-gray-100 rounded animate-pulse shrink-0" />
+                <div className="h-2.5 w-8 bg-gray-100 dark:bg-gray-800/60 rounded animate-pulse shrink-0" />
               </div>
 
               {/* Body lines */}
               <div className="space-y-1.5">
                 <div
-                  className="h-2.5 bg-gray-100 rounded animate-pulse"
+                  className="h-2.5 bg-gray-100 dark:bg-gray-800/60 rounded animate-pulse"
                   style={{ width: `${70 + ((i * 7) % 25)}%` }}
                 />
                 <div
-                  className="h-2.5 bg-gray-100 rounded animate-pulse"
+                  className="h-2.5 bg-gray-100 dark:bg-gray-800/60 rounded animate-pulse"
                   style={{ width: `${40 + ((i * 11) % 30)}%` }}
                 />
               </div>
 
               {/* Meta chips */}
               <div className="flex items-center gap-1.5 pt-0.5">
-                <div className="h-4 w-14 bg-gray-100 rounded animate-pulse" />
-                <div className="h-2.5 w-20 bg-gray-100 rounded animate-pulse" />
+                <div className="h-4 w-14 bg-gray-100 dark:bg-gray-800/60 rounded animate-pulse" />
+                <div className="h-2.5 w-20 bg-gray-100 dark:bg-gray-800/60 rounded animate-pulse" />
               </div>
             </div>
           </div>
@@ -296,72 +296,72 @@ const ICON_MAP: Record<
 > = {
   ORDER_CREATED: {
     icon: Package,
-    color: 'text-blue-600 bg-blue-50',
+    color: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/40',
     label: 'Order',
   },
   ORDER_STATUS_CHANGED: {
     icon: Package,
-    color: 'text-blue-600 bg-blue-50',
+    color: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/40',
     label: 'Order',
   },
   ORDER_ASSIGNED: {
     icon: Bike,
-    color: 'text-purple-600 bg-purple-50',
+    color: 'text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-950/40',
     label: 'Assigned',
   },
   ORDER_PICKED_UP: {
     icon: Package,
-    color: 'text-orange-600 bg-orange-50',
+    color: 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-950/40',
     label: 'Picked up',
   },
   ORDER_DELIVERED: {
     icon: CheckCircle2,
-    color: 'text-green-600 bg-green-50',
+    color: 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-950/40',
     label: 'Delivered',
   },
   ORDER_FAILED: {
     icon: AlertCircle,
-    color: 'text-red-600 bg-red-50',
+    color: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950/40',
     label: 'Failed',
   },
   ORDER_CANCELLED: {
     icon: X,
-    color: 'text-red-600 bg-red-50',
+    color: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950/40',
     label: 'Cancelled',
   },
   COURIER_APPROVED: {
     icon: CheckCircle2,
-    color: 'text-green-600 bg-green-50',
+    color: 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-950/40',
     label: 'Approved',
   },
   COURIER_REJECTED: {
     icon: X,
-    color: 'text-red-600 bg-red-50',
+    color: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950/40',
     label: 'Rejected',
   },
   PAYOUT_PAID: {
     icon: Wallet,
-    color: 'text-emerald-600 bg-emerald-50',
+    color: 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/40',
     label: 'Payout',
   },
   RECEIVER_LINK: {
     icon: Package,
-    color: 'text-indigo-600 bg-indigo-50',
+    color: 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-950/40',
     label: 'Link',
   },
   WELCOME: {
     icon: UserPlus,
-    color: 'text-pink-600 bg-pink-50',
+    color: 'text-pink-600 bg-pink-50 dark:text-pink-400 dark:bg-pink-950/40',
     label: 'Welcome',
   },
   SYSTEM: {
     icon: Settings,
-    color: 'text-gray-600 bg-gray-100',
+    color: 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800',
     label: 'System',
   },
   MANUAL: {
     icon: Bell,
-    color: 'text-primary-600 bg-primary-50',
+    color: 'text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-950/40',
     label: 'Manual',
   },
 };
@@ -389,13 +389,12 @@ function HistoryRow({
   return (
     <div
       onClick={onClick}
-      style={{
-        animationDelay: `${Math.min(index * 30, 300)}ms`,
-      }}
+      style={{ animationDelay: `${Math.min(index * 30, 300)}ms` }}
       className={cn(
-        'group flex items-start gap-3 p-3.5 transition-all animate-in fade-in slide-in-from-right-1 duration-300 fill-mode-backwards',
-        onClick && 'cursor-pointer hover:bg-gray-50',
-        !n.isRead && 'bg-primary-50/40 hover:bg-primary-50/60',
+        'group flex items-start gap-3 p-3.5 transition-all',
+        onClick && 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50',
+        !n.isRead &&
+          'bg-primary-50/40 dark:bg-primary-950/20 hover:bg-primary-50/60 dark:hover:bg-primary-950/30',
       )}
     >
       {/* Icon */}
@@ -409,22 +408,22 @@ function HistoryRow({
           <Icon className="h-4 w-4" />
         </div>
         {!n.isRead && (
-          <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-primary-500 ring-2 ring-white animate-pulse" />
+          <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-primary-500 ring-2 ring-white dark:ring-gray-900 animate-pulse" />
         )}
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-0.5">
-          <p className="text-[13px] font-semibold text-gray-900 truncate leading-tight">
+          <p className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">
             {n.title}
           </p>
-          <span className="text-[10px] text-gray-400 shrink-0 mt-0.5 font-medium">
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0 mt-0.5 font-medium">
             {timeAgo(n.createdAt)}
           </span>
         </div>
 
-        <p className="text-[11.5px] text-gray-600 line-clamp-2 leading-snug">
+        <p className="text-[11.5px] text-gray-600 dark:text-gray-400 line-clamp-2 leading-snug">
           {n.body}
         </p>
 
@@ -433,21 +432,25 @@ function HistoryRow({
           <span
             className={cn(
               'text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded',
-              n.accountType === 'CUSTOMER' && 'bg-blue-50 text-blue-700',
+              n.accountType === 'CUSTOMER' &&
+                'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400',
               n.accountType === 'COURIER' &&
-                'bg-purple-50 text-purple-700',
-              n.accountType === 'STAFF' && 'bg-gray-100 text-gray-600',
+                'bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-400',
+              n.accountType === 'STAFF' &&
+                'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
             )}
           >
             {n.accountType}
           </span>
-          <span className="text-[10px] text-gray-500 truncate max-w-[120px]">
+          <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate max-w-[120px]">
             {recipient}
           </span>
           {n.order?.trackingNumber && (
             <>
-              <span className="text-[10px] text-gray-300">·</span>
-              <span className="text-[10px] text-gray-500 font-mono truncate">
+              <span className="text-[10px] text-gray-300 dark:text-gray-600">
+                ·
+              </span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono truncate">
                 {n.order.trackingNumber}
               </span>
             </>
@@ -457,15 +460,15 @@ function HistoryRow({
         {/* Push status pill */}
         <div className="flex items-center gap-1.5 mt-1.5">
           {n.pushSent ? (
-            <span className="inline-flex items-center gap-1 text-[9.5px] text-green-700 bg-green-50 px-1.5 py-0.5 rounded font-medium">
+            <span className="inline-flex items-center gap-1 text-[9.5px] text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/40 px-1.5 py-0.5 rounded font-medium">
               <CheckCircle2 className="h-2.5 w-2.5" /> Delivered
             </span>
           ) : n.pushError ? (
-            <span className="inline-flex items-center gap-1 text-[9.5px] text-red-700 bg-red-50 px-1.5 py-0.5 rounded font-medium">
+            <span className="inline-flex items-center gap-1 text-[9.5px] text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/40 px-1.5 py-0.5 rounded font-medium">
               <AlertCircle className="h-2.5 w-2.5" /> Failed
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[9.5px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded font-medium">
+            <span className="inline-flex items-center gap-1 text-[9.5px] text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 rounded font-medium">
               <Clock className="h-2.5 w-2.5" /> Pending
             </span>
           )}
@@ -473,7 +476,7 @@ function HistoryRow({
       </div>
 
       {onClick && (
-        <ChevronRight className="h-4 w-4 text-gray-300 shrink-0 mt-3 group-hover:text-gray-500 group-hover:translate-x-0.5 transition-all" />
+        <ChevronRight className="h-4 w-4 text-gray-300 dark:text-gray-600 shrink-0 mt-3 group-hover:text-gray-500 dark:group-hover:text-gray-400 group-hover:translate-x-0.5 transition-all" />
       )}
     </div>
   );
@@ -500,12 +503,12 @@ function timeAgo(iso: string) {
 
 function PreviewPanel() {
   return (
-    <div className="p-5 bg-gradient-to-b from-slate-50 to-white">
-      <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide text-center mb-4">
+    <div className="p-5 bg-gradient-to-b from-slate-50 to-white dark:from-gray-950 dark:to-gray-900">
+      <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide text-center mb-4">
         Lock Screen Preview
       </p>
 
-      <div className="mx-auto max-w-[280px] rounded-[2rem] bg-gradient-to-b from-slate-900 via-slate-800 to-slate-700 p-2.5 shadow-2xl ring-1 ring-black/10">
+      <div className="mx-auto max-w-[280px] rounded-[2rem] bg-gradient-to-b from-slate-900 via-slate-800 to-slate-700 p-2.5 shadow-2xl ring-1 ring-black/10 dark:ring-white/5">
         {/* Notch */}
         <div className="flex justify-center mb-2">
           <div className="h-5 w-24 bg-black rounded-full" />
@@ -560,7 +563,7 @@ function PreviewPanel() {
         </div>
       </div>
 
-      <p className="text-[10px] text-gray-400 text-center mt-4">
+      <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center mt-4">
         Approximate representation
       </p>
     </div>
@@ -574,12 +577,12 @@ function PreviewPanel() {
 function TipsPanel() {
   return (
     <div className="p-4 space-y-3">
-      <div className="bg-gradient-to-br from-primary-50 to-white rounded-xl border border-primary-100 p-4">
-        <h3 className="text-xs font-semibold text-gray-900 mb-2.5 flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5 text-primary-600" />
+      <div className="bg-gradient-to-br from-primary-50 to-white dark:from-primary-950/30 dark:to-gray-900 rounded-xl border border-primary-100 dark:border-primary-900/40 p-4">
+        <h3 className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2.5 flex items-center gap-1.5">
+          <Sparkles className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
           Best Practices
         </h3>
-        <ul className="space-y-2 text-[11.5px] text-gray-700">
+        <ul className="space-y-2 text-[11.5px] text-gray-700 dark:text-gray-300">
           <TipItem>
             Keep the title under <b>40 characters</b> — it truncates on
             Android.
@@ -594,9 +597,9 @@ function TipsPanel() {
         </ul>
       </div>
 
-      <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-        <h3 className="text-xs font-semibold text-gray-700 mb-2.5 flex items-center gap-1.5">
-          <Settings className="h-3.5 w-3.5 text-gray-500" />
+      <div className="bg-gray-50 dark:bg-gray-950/50 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+        <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2.5 flex items-center gap-1.5">
+          <Settings className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
           Broadcast Topics
         </h3>
         <div className="flex flex-wrap gap-1.5">
@@ -607,9 +610,9 @@ function TipsPanel() {
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-        <h3 className="text-xs font-semibold text-gray-700 mb-2.5 flex items-center gap-1.5">
-          <Clock className="h-3.5 w-3.5 text-gray-500" />
+      <div className="bg-gray-50 dark:bg-gray-950/50 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+        <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2.5 flex items-center gap-1.5">
+          <Clock className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
           API Endpoints
         </h3>
         <div className="space-y-1.5 text-[10.5px] font-mono">
@@ -636,28 +639,28 @@ function StatsRow() {
         label="Total Sent"
         value={stats.data?.total}
         loading={stats.isLoading}
-        accent="text-blue-600 bg-blue-50"
+        accent="text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/40"
       />
       <StatCard
         icon={TrendingUp}
         label="Today"
         value={stats.data?.today}
         loading={stats.isLoading}
-        accent="text-purple-600 bg-purple-50"
+        accent="text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-950/40"
       />
       <StatCard
         icon={CheckCircle2}
         label="Delivered"
         value={stats.data?.pushed}
         loading={stats.isLoading}
-        accent="text-green-600 bg-green-50"
+        accent="text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-950/40"
       />
       <StatCard
         icon={AlertTriangle}
         label="Failed"
         value={stats.data?.failed}
         loading={stats.isLoading}
-        accent="text-red-600 bg-red-50"
+        accent="text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950/40"
       />
     </div>
   );
@@ -677,9 +680,9 @@ function StatCard({
   loading?: boolean;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">
+        <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
           {label}
         </span>
         <div
@@ -692,9 +695,9 @@ function StatCard({
         </div>
       </div>
       {loading ? (
-        <div className="h-7 w-16 bg-gray-200 rounded animate-pulse" />
+        <div className="h-7 w-16 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
       ) : (
-        <p className="text-2xl font-bold text-gray-900 tabular-nums">
+        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 tabular-nums">
           {value ?? '—'}
         </p>
       )}
@@ -724,14 +727,14 @@ function RightTabButton({
       className={cn(
         'flex-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs font-medium transition-colors relative',
         active
-          ? 'text-primary-700 bg-white'
-          : 'text-gray-500 hover:text-gray-800 hover:bg-white/50',
+          ? 'text-primary-700 dark:text-primary-400 bg-white dark:bg-gray-900'
+          : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-800/50',
       )}
     >
       <Icon className="h-3.5 w-3.5" />
       {label}
       {active && (
-        <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-primary-600 rounded-full" />
+        <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full" />
       )}
     </button>
   );
@@ -752,11 +755,15 @@ function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-      <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mb-3 ring-1 ring-gray-100">
-        <Icon className="h-7 w-7 text-gray-400" />
+      <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center mb-3 ring-1 ring-gray-100 dark:ring-gray-800">
+        <Icon className="h-7 w-7 text-gray-400 dark:text-gray-500" />
       </div>
-      <p className="text-sm font-semibold text-gray-700">{title}</p>
-      <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        {title}
+      </p>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        {subtitle}
+      </p>
     </div>
   );
 }
@@ -775,10 +782,10 @@ function Banner({
   return (
     <div
       className={cn(
-        'flex items-start gap-3 p-4 rounded-xl border animate-in fade-in slide-in-from-top-2 duration-200',
+        'flex items-start gap-3 p-4 rounded-xl border',
         type === 'success'
-          ? 'bg-green-50 border-green-200 text-green-800'
-          : 'bg-red-50 border-red-200 text-red-800',
+          ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950/40 dark:border-green-900/60 dark:text-green-300'
+          : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-300',
       )}
     >
       <Icon className="h-5 w-5 shrink-0 mt-0.5" />
@@ -798,7 +805,9 @@ function Banner({
 function TipItem({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex gap-2">
-      <span className="text-primary-500 mt-0.5 shrink-0">•</span>
+      <span className="text-primary-500 dark:text-primary-400 mt-0.5 shrink-0">
+        •
+      </span>
       <span>{children}</span>
     </li>
   );
@@ -806,7 +815,7 @@ function TipItem({ children }: { children: React.ReactNode }) {
 
 function TopicChip({ value }: { value: string }) {
   return (
-    <code className="inline-block bg-white border border-gray-200 px-2 py-1 rounded-md text-[10.5px] text-gray-700 font-mono hover:border-primary-300 hover:bg-primary-50/30 transition-colors">
+    <code className="inline-block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-2 py-1 rounded-md text-[10.5px] text-gray-700 dark:text-gray-300 font-mono hover:border-primary-300 dark:hover:border-primary-700 hover:bg-primary-50/30 dark:hover:bg-primary-950/30 transition-colors">
       {value}
     </code>
   );
@@ -815,10 +824,12 @@ function TopicChip({ value }: { value: string }) {
 function EndpointRow({ method, path }: { method: string; path: string }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[9px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded uppercase">
+      <span className="text-[9px] font-bold bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded uppercase">
         {method}
       </span>
-      <span className="text-gray-700 truncate">{path}</span>
+      <span className="text-gray-700 dark:text-gray-300 truncate">
+        {path}
+      </span>
     </div>
   );
 }
