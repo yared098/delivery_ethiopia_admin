@@ -14,6 +14,7 @@ import { OrderDetail } from '@/pages/OrderDetail';
 import { PaymentProviders } from '@/pages/PaymentProviders';
 import { NotFound } from '@/pages/NotFound';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { Notifications } from './pages/Notifications';
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +40,8 @@ export const router = createBrowserRouter([
       { path: 'orders/new', element: <OrderCreate /> },       // ← NEW
       { path: 'orders/:id', element: <OrderDetail /> },        // ← NEW
       { path: 'payment-providers', element: <PaymentProviders /> },
+      { path: 'notifications', element: <Notifications /> },   // ← ADD
+
       { path: '*', element: <NotFound /> },
     ],
   },

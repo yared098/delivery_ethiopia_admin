@@ -9,6 +9,7 @@ import {
   Bike,
   CreditCard,
   UserCheck,
+  Bell,                 // ← ADD
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 import { api } from '@/lib/api';
@@ -29,7 +30,6 @@ const nav: NavItem[] = [
     label: 'Dashboard',
     icon: LayoutDashboard,
     end: true,
-    // no roles → everyone sees it
   },
   {
     to: '/regions',
@@ -53,7 +53,6 @@ const nav: NavItem[] = [
     to: '/couriers',
     label: 'Couriers',
     icon: Bike,
-    // everyone (staff + regional + branch)
   },
   {
     to: '/customers',
@@ -71,6 +70,12 @@ const nav: NavItem[] = [
     icon: CreditCard,
     roles: [StaffRole.SUPER_ADMIN],
   },
+  {
+    to: '/notifications',
+    label: 'Notifications',
+    icon: Bell,
+    roles: [StaffRole.SUPER_ADMIN, StaffRole.REGIONAL_ADMIN],   // ← ADD
+  },
 ];
 
 export function DashboardLayout() {
@@ -86,18 +91,18 @@ export function DashboardLayout() {
     navigate('/login');
   };
 
-  // Filter nav by current role
   const visibleNav = nav.filter((item) => {
     if (!item.roles) return true;
     if (!account?.role) return false;
     return item.roles.includes(account.role);
   });
 
-  const roleLabel = {
-    SUPER_ADMIN: 'Super Admin',
-    REGIONAL_ADMIN: 'Regional Admin',
-    BRANCH_MANAGER: 'Branch Manager',
-  }[account?.role as string] || account?.role || 'Staff';
+  const roleLabel =
+    {
+      SUPER_ADMIN: 'Super Admin',
+      REGIONAL_ADMIN: 'Regional Admin',
+      BRANCH_MANAGER: 'Branch Manager',
+    }[account?.role as string] || account?.role || 'Staff';
 
   return (
     <div className="flex h-full">
